@@ -1,0 +1,174 @@
+
+#include <FastLED.h>
+
+#define NUM_LEDS 50
+#define DATA_PIN 6
+
+#define L_A 34
+#define L_B 33
+#define L_C 32
+#define L_D 31
+#define L_E 30
+#define L_F 29
+#define L_G 28
+#define L_H 27
+#define L_I 16
+#define L_J 17
+#define L_K 18
+#define L_L 19
+#define L_M 20
+#define L_N 21
+#define L_O 22
+#define L_P 23
+#define L_Q 24
+#define L_R 13
+#define L_S 12
+#define L_T 11
+#define L_U 10
+#define L_V 9
+#define L_W 8
+#define L_X 7
+#define L_Y 6
+#define L_Z 5
+
+CRGB leds[NUM_LEDS];
+
+#define totalphrases 5;
+
+String PHRASES[] = {
+  "abcdefghijklmnopqrstuvwxyz",
+  "hell yeah",
+  "stranger things"
+};
+
+int colorChoices[] = {0, 255};
+
+void setup() {
+
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+
+  Serial.begin(9600);
+
+}
+
+uint8_t find_light_letter(char letter) {
+  switch (letter) {
+    case 'a': return L_A;
+    case 'b': return L_B;
+    case 'c': return L_C;
+    case 'd': return L_D;
+    case 'e': return L_E;
+    case 'f': return L_F;
+    case 'g': return L_G;
+    case 'h': return L_H;
+    case 'i': return L_I;
+    case 'j': return L_J;
+    case 'k': return L_K;
+    case 'l': return L_L;
+    case 'm': return L_M;
+    case 'n': return L_N;
+    case 'o': return L_O;
+    case 'p': return L_P;
+    case 'q': return L_Q;
+    case 'r': return L_R;
+    case 's': return L_S;
+    case 't': return L_T;
+    case 'u': return L_U;
+    case 'v': return L_V;
+    case 'w': return L_W;
+    case 'x': return L_X;
+    case 'y': return L_Y;
+    case 'z': return L_Z;
+    default:  return 0;
+  }
+}
+
+void loop() {
+
+  uint8_t current_phrase = rand() % totalphrases;
+
+  printphrase(current_phrase);
+
+
+  lightningcrash();
+
+  delay(2500);
+}
+
+void printphrase(uint8_t phrasenum) {
+  for (uint8_t b = 0; b < PHRASES[phrasenum].length(); b++) {
+    char curr_letter = PHRASES[phrasenum].charAt(b);
+    uint8_t curr_light = find_light_letter(curr_letter);
+    if (curr_light == 0) {
+      delay(1000);
+    } else {
+      lightletter(curr_light);  // light correct light
+    }
+  }
+}
+
+void lightletter(int letter_num) {
+  int red= colorChoices[rand() % 2];
+  int gre= colorChoices[rand() % 2];
+  int blu= colorChoices[rand() % 2];
+  if( red == 255 && gre == 255 && blu == 255){
+    blu = 0;
+  }
+  if(red == 0 && gre == 0 && blu == 0){
+    red = 255;
+  }
+  leds[letter_num] = CRGB(red, gre, blu);
+  FastLED.setBrightness(255);
+  FastLED.show();
+  for (int i = 255; i >= 0; i-- ) {  // fade current LED out
+    FastLED.setBrightness(i);
+    FastLED.show();
+    delay(2);
+  }
+  FastLED.clear();
+  FastLED.setBrightness(255);  // reset strip brightness for next letter
+  delay(1300);  // delay between letters - should probably be in printphrase()
+}
+
+//flash all lights several times
+void lightningcrash() {
+  // set of rapid flashes
+  
+  for (int i = 5; i <= 34; i++) { //Assign random colours to the LEDs being lit up
+    int red= colorChoices[rand() % 2];
+    int gre= colorChoices[rand() % 2];
+    int blu= colorChoices[rand() % 2];
+    if( red == 255 && gre == 255 && blu == 255){
+      blu = 0;
+    }
+    if(red == 0 && gre == 0 && blu == 0){
+      red = 255;
+    }
+    leds[i] = CRGB(red, gre, blu);
+  }
+  for (int times = 0; times < 12; times++) {
+    randomSeed(analogRead(0));
+    int waitTime = random(300);
+    
+    FastLED.show();
+    delay(waitTime);
+    FastLED.setBrightness(0);
+    FastLED.show();
+    FastLED.setBrightness(255);
+    delay(waitTime);
+  }
+
+  // -- decay sequence
+
+  FastLED.show(); 
+  for (int i = 255; i >= 0; i-- ) {
+    FastLED.setBrightness(i);
+    FastLED.show();
+    delay(4);  // decay speed
+  }
+  FastLED.clear();
+  FastLED.setBrightness(255); // reset brightness
+}
+
+ //   Contact GitHub API Training Shop Blog About 
+
